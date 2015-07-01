@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Examples</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <link href="" rel="stylesheet"></head>
+<body>
+    版本三
+    <br>
+    <script>
+//通用代码
+var observer = {
+    //订阅
+    addSubscriber: function (callback) {
+        this.subscribers[this.subscribers.length] = callback;
+    },
+    //退订
+    removeSubscriber: function (callback) {
+        for (var i = 0; i < this.subscribers.length; i++) {
+            if (this.subscribers[i] === callback) {
+                delete (this.subscribers[i]);
+            }
+        }
+    },
+    //发布
+    publish: function (what) {
+        for (var i = 0; i < this.subscribers.length; i++) {
+            if (typeof this.subscribers[i] === 'function') {
+                this.subscribers[i](what);
+            }
+        }
+    },
+    // 将对象o具有观察者功能
+    make: function (o) { 
+        for (var i in this) {
+            o[i] = this[i];
+            o.subscribers = [];
+        }
+    }
+};
+
+var blogger = {
+    recommend: function (id) {
+        var msg = 'dudu 推荐了的帖子:' + id;
+        this.publish(msg);
+    }
+};
+
+var user = {
+    vote: function (id) {
+        var msg = '有人投票了!ID=' + id;
+        this.publish(msg);
+    }
+};
+
+observer.make(blogger);
+observer.make(user);
+
+
+//test 2个对象
+var tom = {
+    read: function (what) {
+        console.log('Tom看到了如下信息：' + what)
+    }
+};
+
+var mm = {
+    show: function (what) {
+        console.log('mm看到了如下信息：' + what)
+    }
+};
+
+
+// 订阅
+function subscript(){
+    blogger.addSubscriber(tom.read);
+    blogger.addSubscriber(mm.show);
+    //调用发布
+}
+
+//退订
+function unsubscribe(){
+    blogger.removeSubscriber(mm.show);
+    blogger.removeSubscriber(tom.read);
+}
+
+//发布通知
+function publish(){
+    blogger.recommend(123); 
+}
+
+//另外一个对象的订阅
+function other(){
+    user.addSubscriber(mm.show);
+    user.vote(789); //调用发布
+}
+    </script>
+
+    <button type="button" onclick="subscript()" >订阅</button>
+
+    <button type="button" onclick="publish()" >发布</button>
+
+    <button type="button" onclick="unsubscribe()" >退订</button>
+
+    <button type="button" onclick="other()" >另外一个对象的订阅</button>
+
+</body>
+</html>

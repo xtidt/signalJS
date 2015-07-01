@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Examples</title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<link href="" rel="stylesheet"></head>
+<body>
+版本二<br>
+<script>
+// js hack
+if (!Array.prototype.forEach) {
+    Array.prototype.forEach = function (fn, thisObj) {
+        var scope = thisObj || window;
+        for (var i = 0, j = this.length; i < j; ++i) {
+            fn.call(scope, this[i], i, this);
+        }
+    };
+}
+if (!Array.prototype.filter) {
+    Array.prototype.filter = function (fn, thisObj) {
+        var scope = thisObj || window;
+        var a = [];
+        for (var i = 0, j = this.length; i < j; ++i) {
+            if (!fn.call(scope, this[i], i, this)) {
+                continue;
+            }
+            a.push(this[i]);
+        }
+        return a;
+    };
+}
+
+
+function Observer() {
+    this.fns = [];
+}
+Observer.prototype = {
+    subscribe: function (fn) {
+        this.fns.push(fn);
+        console.log('订阅成功');
+    },
+    unsubscribe: function (fn) {
+        this.fns = this.fns.filter(
+                        function (el) {
+                            if (el !== fn) {
+                                return el;
+                            }
+                        }
+                    );
+    },
+    update: function (o, thisObj) {
+        var scope = thisObj || window;
+        this.fns.forEach(
+                        function (el) {
+                            el.call(scope, o);
+                        }
+                    );
+    }
+};
+
+//测试
+var o = new Observer;
+var f1 = function (data) {
+    console.log('Robbin: ' + data + ', 赶紧干活了！');
+};
+
+var f2 = function (data) {
+    console.log('Randall: ' + data + ', 找他加点工资去！');
+};
+
+//再来验证
+o.update("Tom回来了！");
+
+// 订阅
+function subscript(){
+            o.subscribe(f1);
+            // o.subscribe(f2);
+}
+
+//退订
+function unsubscribe(){
+	o.unsubscribe(f1);
+}
+
+//发布通知
+function publish(){
+	o.update("Tom回来了！")
+}
+</script>
+
+<button type="button" onclick="subscript()" >订阅</button>
+
+<button type="button" onclick="publish()" >发布</button>
+
+<button type="button" onclick="unsubscribe()" >退订</button>
+
+
+</body>
+</html>
